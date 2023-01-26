@@ -1,4 +1,3 @@
-
 #include <cstddef>
 #include <stdexcept>
 #include "ulliststr.h"
@@ -29,6 +28,7 @@ size_t ULListStr::size() const
 
 // WRITE YOUR CODE HERE
 void ULListStr::push_back(const std::string& val) {
+// first case when it's empty
 if (empty()) {
 	head_ = new Item;
 	head_->prev = nullptr;
@@ -38,11 +38,13 @@ if (empty()) {
 	head_->last++;
 	size_++;
 } 
+// regular adding the the back
 else if (tail_->last < ARRSIZE) {
 	tail_->val[tail_->last] = val;
 	tail_->last++;
 	size_++;
 } 
+// if the case where the array is full
 else {
 	Item* new_tail = new Item;
 	new_tail->prev = tail_;
@@ -57,6 +59,7 @@ else {
 
 void ULListStr::push_front(const std::string& val)
 {
+	// first case when it's empty
 	if(empty()){
 				head_ = new Item;
 				head_->prev = nullptr;
@@ -75,12 +78,12 @@ void ULListStr::push_front(const std::string& val)
 		head_-> prev = new_head;
 		head_ = new_head;
 
-		// head_ -> last++;
 		head_ -> val[ARRSIZE-1] = val;
 		head_-> first = ARRSIZE-1;
 		head_-> last = ARRSIZE;
 		size_++;
 	}
+	// regular adding the the front
 	else {
 		head_ -> first--;
 		head_ -> val [head_ -> first] = val;
@@ -92,9 +95,11 @@ void ULListStr::push_front(const std::string& val)
 
 
 void ULListStr::pop_back(){
+	// if there is no elements
 	if (size_ == 0){
 		throw std::out_of_range("List is empty");
 	}
+	// if only first node and it's empty
 	 if (head_ == tail_ && head_->last - head_ -> first == 1){
 		Item* temp = head_;
 		delete temp;
@@ -102,6 +107,7 @@ void ULListStr::pop_back(){
 		tail_ = nullptr;
 		size_--;
 	}
+	// if node it's empty but not one node 
 	else if (tail_->last  - tail_ -> first == 1) {
 		Item* temp = tail_;
 		tail_ = tail_->prev;
@@ -109,6 +115,7 @@ void ULListStr::pop_back(){
 		delete temp;
 		size_--;
 	}
+	// regular popping 
 	else {
 		tail_->last--;
 		size_--;
@@ -116,9 +123,11 @@ void ULListStr::pop_back(){
 }
 
 void ULListStr::pop_front(){
+	// if there is no elements
 	if (size_ == 0){
 		throw std::out_of_range("List is empty");
 	}
+	// if only first node and it's empty
 	if (head_ == tail_ && head_->last - head_ -> first == 1){
 		Item* temp = head_;
 		delete temp;
@@ -126,6 +135,7 @@ void ULListStr::pop_front(){
 		tail_ = nullptr;
 		size_--;
 	}
+	// if node it's empty but not one node 
 	else if (head_->last - head_ -> first == 1) {
 		Item* temp = head_;
 		head_->prev = nullptr;
@@ -133,6 +143,7 @@ void ULListStr::pop_front(){
 		delete temp;
 		size_--;
 	}
+	// regular popping 
 	else {
 		head_->first++;
 		size_--;
@@ -141,81 +152,60 @@ void ULListStr::pop_front(){
 
 
 std::string const & ULListStr::back() const{
+	// there is not element
 	if (size_ == 0){
 		throw std::out_of_range("back is empty.");
 	}
+	// accesing the back 
 	else {
 		return tail_ -> val[tail_->last -1];
 	}
 }
 
 std::string const & ULListStr::front() const{
+	// there is not element
 	if (size_ == 0){
 		throw std::out_of_range("front is empty.");
 	}
+	// accesing the front 
 	else {
 		return head_ -> val[head_->first];
 	}
 }
-
 std::string* ULListStr::getValAtLoc(size_t loc) const{
 
-// make a pointer which will helps us traverse
-Item * ptr_rtr = head_;
+    // make a pointer which will helps us traverse
+    Item * ptr = head_;
 
-if ( loc >= size_){
-throw std::out_of_range("bad loc");
+    if ( loc >= size_){
+        throw std::out_of_range("loc out of range");
+    }
+
+    if (ptr == nullptr){
+        throw std::out_of_range("loc out of range");
+    }
+
+    // Traverse through each node
+    while(ptr != nullptr){
+        // grab the first and last indexs for the node
+        size_t cur_first =  ptr->first;
+        size_t cur_last =  ptr->last;
+        
+        // Loop through each value in the array
+        for(size_t i=cur_first; i<cur_last; i++){
+
+            // If loc become 0, thats the value
+            if(loc == 0){
+                return &(ptr->val[i]);
+            }
+            loc--;
+        }
+
+        ptr = ptr->next;
+    } 
+	return nullptr;
+
 }
-
-if (ptr_rtr == nullptr){
- throw std::out_of_range("bad loc");
-}
-
-while (loc >= (ptr_rtr->last - ptr_rtr->first)) {
-	if(ptr_rtr->next == nullptr){
-		throw std::out_of_range("bad loc");
-	}
-	loc -= (ptr_rtr->last - ptr_rtr->first);
-	ptr_rtr = ptr_rtr->next;
-}
-return &(ptr_rtr->val[ptr_rtr->first + loc]);
-}
-
-
-
-// std::string* ULListStr::getValAtLoc(size_t loc) const{
-   
-//   // make a pointer which will helps us traverse    
-//    Item * ptr_rtr = head_;
-
-//    if ( loc >= size_){
-//     throw std::out_of_range("bad loc");
-//    }
-
-//     if (ptr_rtr == nullptr){
-//      throw std::out_of_range("bad loc");
-//     }
-//   // loop through each array element inside the node
-//     for (int i =0; i < ARRSIZE; i++){
-//       // if found then return 
-//       if (ptr_rtr-> first + i == loc && ptr_rtr->val[i].empty() == false)
-//       {
-//         if (ptr_rtr -> first + i > ptr_rtr-> last || loc >= ptr_rtr -> last - ptr_rtr->first){
-//           break;
-//         }
-//         // return  &ptr_rtr->val[loc - ptr_rtr->first];
-//         return  &(ptr_rtr->val[loc -ptr_rtr->first]);
-
-//     }      
-     
-//     else {
-//       // else move on to the next node
-//       ptr_rtr = ptr_rtr -> next;
-//     }
-    
-//    }
-
-// }
 
 
 void ULListStr::set(size_t loc, const std::string& val)
